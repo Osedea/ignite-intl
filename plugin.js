@@ -18,7 +18,7 @@ const PROVIDER = `                <RawIntlProvider\n                    value={i
 const CLOSE_PROVIDER = `                </RawIntlProvider>`;
 const CHANGE_LANGUAGE = `    // changeLanguage = () => {\n    //     if (this.state.locale === 'en') {\n    //         changeLanguage('fr')\n    //     } else {\n    //         changeLanguage('en')\n    //     }\n    // }\n`;
 const SCREEN_PROPS = `                        screenProps={{\n                            translate,\n                        }}`
-const CHANGE_LANGUAGE_BUTTON = `                    {* <Button title={translate({ id: 'languageSwitch' })} onPress={this.changeLanguage} /> *}`
+const CHANGE_LANGUAGE_BUTTON = `                    {/* <Button title={translate({ id: 'languageSwitch' })} onPress={this.changeLanguage} /> */}`
 
 const add = async function (toolbox) {
     // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
