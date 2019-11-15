@@ -7,16 +7,18 @@ const NPM_MODULE_VERSION = '~1.3.1'
 const REACT_INTL = 'react-intl'
 const REACT_INTL_VERSION = '~3.6.0'
 
-const INTL_PROVIDER_IMPORT = `import { IntlProvider } from 'react-intl';`;
+const INTL_PROVIDER_IMPORT = `import { RawIntlProvider } from 'react-intl';`;
 const LOCALIZE_IMPORT = `import * as RNLocalize from 'react-native-localize';`;
-const TRANSLATION_IMPORT = `import { defaultLocale, handleLocalizationChange, getLocale, translationMessages } from './i18n';`;
-const HANDLE_LOCALIZATION_CHANGE = `\n    handleLocalizationChange = () => {\n        const locale = getLocale();\n        this.setState({ locale });\n    };\n`;
-const COMP_DID_MOUNT = `    componentDidMount() {\n        RNLocalize.addEventListener('change', handleLocalizationChange);\n    }\n`;
-const COMP_WILL_UNMOUNT = `    componentWillUnmount() {\n        RNLocalize.removeEventListener('change', handleLocalizationChange);\n    }`;
-const STATE = `    state = { locale: defaultLocale };\n`;
-const PROVIDER = `                <IntlProvider\n                    locale={this.state.locale.languageTag}\n                    messages={translationMessages[this.state.locale.languageTag]}\n                >`;
-const CLOSE_PROVIDER = `                </IntlProvider>`;
-const CHANGE_LANGUAGE = `    // setLocale = () => {\n    //     if (this.state.locale.languageTag === 'en') {\n    //         this.setState({ locale: { languageTag: 'fr' } });\n    //     } else {\n    //         this.setState({ locale: { languageTag: 'en' } });\n    //     }\n    // }\n`
+const TRANSLATION_IMPORT = `import { getLocale, loadLocale, translate, registerLanguageListener, unregisterLanguageListener, intl, changeLanguage, currentLocale } from './i18n';`;
+const HANDLE_LOCALIZATION_CHANGE = `\n    handleLocalizationChange = (locale: string) => {\n        this.setState({ locale });\n    };\n`;
+const COMP_DID_MOUNT = `    componentDidMount() {\n        RNLocalize.addEventListener('change', getLocale);\n        registerLanguageListener(this.handleLocalizationChange);\n        loadLocale().then((lang) => lang && changeLanguage(lang));\n    }`;
+const COMP_WILL_UNMOUNT = `    componentWillUnmount() {\n        RNLocalize.removeEventListener('change', getLocale);\n        unregisterLanguageListener(this.handleLocalizationChange);\n    }`;
+const STATE = `    state = { locale: currentLocale };\n`;
+const PROVIDER = `                <RawIntlProvider\n                    value={intl}\n                >`;
+const CLOSE_PROVIDER = `                </RawIntlProvider>`;
+const CHANGE_LANGUAGE = `    // changeLanguage = () => {\n    //     if (this.state.locale === 'en') {\n    //         changeLanguage('fr')\n    //     } else {\n    //         changeLanguage('en')\n    //     }\n    // }\n`;
+const SCREEN_PROPS = `                        screenProps={{\n                            translate,\n                        }}`
+const CHANGE_LANGUAGE_BUTTON = `                    {* <Button title={translate({ id: 'languageSwitch' })} onPress={this.changeLanguage} /> *}`
 
 const add = async function (toolbox) {
     // Learn more about toolbox: https://infinitered.github.io/gluegun/#/toolbox-api.md
@@ -161,6 +163,22 @@ const add = async function (toolbox) {
             } catch (e) {
                 print.error('Oopsy, couldnt add default state');
             }
+            try {
+                ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, {
+                    insert: SCREEN_PROPS,
+                    after: `<RootNavigator`
+                });
+            } catch (e) {
+                print.error('Oopsy, couldnt add screenProps');
+            }
+            try {
+                ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, {
+                    insert: CHANGE_LANGUAGE_BUTTON,
+                    after: `/>`
+                });
+            } catch (e) {
+                print.error('Oopsy, couldnt add changeLanguageButton');
+            }
             ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, {
                 insert: PROVIDER,
                 after: `<Provider store={store}>`
@@ -291,6 +309,16 @@ const remove = async function (toolbox) {
                 ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, { delete: STATE });
             } catch (e) {
                 print.error('Oopsy, couldnt remove default state');
+            }
+            try {
+                ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, { delete: SCREEN_PROPS });
+            } catch (e) {
+                print.error('Oopsy, couldnt remove screenProps');
+            }
+            try {
+                ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, { delete: CHANGE_LANGUAGE_BUTTON });
+            } catch (e) {
+                print.error('Oopsy, couldnt remove changeLanguageButton');
             }
             ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, { delete: PROVIDER });
             ignite.patchInFile(`${FOLDER}/index.${EXTENSION}x`, { delete: CLOSE_PROVIDER });
