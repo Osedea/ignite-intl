@@ -1,8 +1,14 @@
 {
   "name": "ignite-intl",
   "description": "An ignite plugin to add localization/translations to your app",
-  "keywords": ["intl", "localization", "translation", "ignite", "react-native"],
-  "version": "0.0.4",
+  "keywords": [
+    "intl",
+    "localization",
+    "translation",
+    "ignite",
+    "react-native"
+  ],
+  "version": "0.0.5",
   "license": "MIT",
   "author": {
     "name": "Adrien THIERY",
